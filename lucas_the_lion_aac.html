@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucas the Lion — AAC Board</title>
+<style>
+:root{
+  --ink:#18212f; --muted:#64748b; --line:#d9e1eb; --paper:#f4f7fb;
+  --orange:#f6a34b; --green:#a8e9ad; --blue:#b9edf2; --pink:#f8c2d0;
+  --cream:#fff8df; --focus:#285fe8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#f4f7fb,#eaf1f8);color:var(--ink);font-family:ui-rounded,"Arial Rounded MT Bold",system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:18px clamp(14px,3vw,32px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:48px;height:48px;border-radius:15px;background:#ffefd5;display:grid;place-items:center;font-size:29px}
+h1{font-size:clamp(1.25rem,2.5vw,1.8rem);margin:0;letter-spacing:-.03em}
+.subtitle{font-size:.9rem;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+.utility{border:1px solid #d5deea;background:#fff;border-radius:12px;padding:10px 14px;font-weight:700;color:#263348}
+.utility:hover{background:#f1f5f9}
+main{max-width:1250px;margin:0 auto;padding:clamp(12px,2.5vw,28px)}
+.sentence-panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:18px;box-shadow:0 5px 18px #2538580a}
+.panel-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.panel-top h2{font-size:1rem;margin:0}
+.hint{font-size:.84rem;color:var(--muted)}
+.sentence{min-height:60px;border:2px dashed #d6deea;border-radius:14px;padding:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fbfdff}
+.placeholder{color:#94a3b8;padding:7px}
+.word-chip{background:#e9f2ff;border:1px solid #c8dcff;border-radius:10px;padding:8px 10px;font-weight:750}
+.panel-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.primary{background:#1f5bd8;color:white;border:0;border-radius:12px;padding:11px 16px;font-weight:800}
+.primary:hover{background:#194bb5}
+.board-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:18px 2px 12px;flex-wrap:wrap}
+.board-heading h2{margin:0;font-size:1.15rem}
+.board-heading p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.tile{position:relative;min-height:135px;border:2px solid #202938;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 6px 8px;gap:5px;box-shadow:0 3px 0 #17203318;transition:transform .08s,box-shadow .08s;overflow:hidden;color:#111827}
+.tile:active{transform:translateY(2px);box-shadow:0 1px 0 #17203318}
+.tile:focus-visible{outline:4px solid var(--focus);outline-offset:2px}
+.tile .label{font-size:clamp(.82rem,1.5vw,1.1rem);line-height:1.1;font-weight:850;text-align:center}
+.tile img{width:88px;height:75px;max-width:90%;object-fit:contain;mix-blend-mode:multiply}
+.tile .emoji{height:75px;display:grid;place-items:center;font-size:54px;line-height:1}
+.orange{background:linear-gradient(135deg,#ffd2a0,#f7a54f)}
+.green{background:linear-gradient(135deg,#d8ffda,#a2eaa8)}
+.blue{background:linear-gradient(135deg,#e1fbfd,#b6eaf0)}
+.pink{background:linear-gradient(135deg,#ffe3eb,#f6bfd0)}
+.cream{background:linear-gradient(135deg,#fffdf0,#fff4cf)}
+.blank{background:#fff;border-color:#e3e8ef;box-shadow:none;cursor:default;min-height:135px}
+.tile .speak-indicator{position:absolute;right:7px;top:6px;font-size:15px;opacity:.7}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px 8px}
+.status{font-size:.86rem;color:#285a36;min-height:1.2em;margin-top:8px}
+@media(max-width:720px){.grid{gap:6px}.tile{min-height:112px;padding:8px 3px}.tile img,.tile .emoji{height:60px}.tile .emoji{font-size:42px}.blank{min-height:112px}}
+@media(max-width:430px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tile,.blank{min-height:126px}.tile .label{font-size:1rem}.tile img,.tile .emoji{height:68px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">🦁</div>
+    <div><h1>Lucas the Lion</h1><div class="subtitle">My communication board</div></div>
+  </div>
+  <div class="header-actions">
+    <button class="utility" id="touchBtn" aria-pressed="false">👆 Touch mode: Off</button>
+    <button class="utility" id="slowBtn" aria-pressed="false">🐢 Slow voice: Off</button>
+    <button class="utility" id="stopBtn">■ Stop voice</button>
+  </div>
+</header>
+<main>
+  <section class="sentence-panel" aria-labelledby="sentenceHeading">
+    <div class="panel-top">
+      <h2 id="sentenceHeading">💬 My message</h2>
+      <span class="hint">Tap pictures to build a message.</span>
+    </div>
+    <div class="sentence" id="sentence" aria-live="polite"><span class="placeholder">Your words will appear here…</span></div>
+    <div class="panel-actions">
+      <button class="primary" id="speakBtn">🔊 Speak message</button>
+      <button class="utility" id="undoBtn">↶ Undo last</button>
+      <button class="utility" id="clearBtn">✕ Clear</button>
+    </div>
+    <div class="status" id="status" role="status"></div>
+  </section>
+
+  <div class="board-heading">
+    <div><h2>Choose a word or picture</h2><p>Each picture can be selected by touch or mouse.</p></div>
+    <span class="hint" id="touchHint">Touch mode is off</span>
+  </div>
+  <section class="grid" id="board" aria-label="AAC picture communication board"></section>
+  <footer>Communication is for everyone. Allow time for Lucas to choose and respond.</footer>
+</main>
+<script>
+const tiles = [
+ {label:"I",say:"I",color:"cream",emoji:"🧍"},
+ {blank:true},{blank:true},{blank:true},
+ {label:"Lucas the Lion",say:"Lucas the Lion",color:"orange",emoji:"🦁"},
+ {label:"see",say:"see",color:"green",emoji:"👀"},
+ {blank:true},
+ {label:"television",say:"television",color:"orange",emoji:"📺"},
+ {label:"mom",say:"mom",color:"orange",emoji:"🧸"},
+ {label:"play",say:"play",color:"green",emoji:"🧸"},
+ {label:"help",say:"help",color:"green",emoji:"🙋"},
+ {label:"bathroom",say:"bathroom",color:"orange",emoji:"🚽"},
+ {label:"Blair the bear",say:"Blair the bear",color:"orange",emoji:"🧸"},
+ {label:"hungry",say:"hungry",color:"blue",emoji:"🍽️"},
+ {blank:true},
+ {label:"tiny talker",say:"tiny talker",color:"orange",emoji:"🗣️"},
+ {blank:true},
+ {label:"thirsty",say:"thirsty",color:"blue",emoji:"🥤"},
+ {label:"hurt",say:"hurt",color:"blue",emoji:"🤕"},
+ {label:"sorry",say:"sorry",color:"pink",emoji:"🙇"},
+ {label:"all done",say:"all done",color:"cream",emoji:"👏"},
+ {label:"more please",say:"more please",color:"cream",emoji:"🙏"},
+ {label:"yes",say:"yes",color:"cream",emoji:"✅"},
+ {label:"no",say:"no",color:"cream",emoji:"❌"}
+];
+const board = document.getElementById("board");
+const sentence = document.getElementById("sentence");
+const status = document.getElementById("status");
+let words = [];
+let slow = false;
+let touchMode = false;
+let touchSpeak = true;
+let voice = null;
+
+function renderBoard(){
+  tiles.forEach((item,index)=>{
+    if(item.blank){
+      const blank=document.createElement("div");
+      blank.className="tile blank";
+      blank.setAttribute("aria-hidden","true");
+      board.appendChild(blank);
+      return;
+    }
+    const b=document.createElement("button");
+    b.className=`tile ${item.color}`;
+    b.type="button";
+    b.setAttribute("aria-label",`Say ${item.say}`);
+    b.innerHTML=`<span class="speak-indicator" aria-hidden="true">🔊</span><span class="label"></span><span class="emoji" aria-hidden="true"></span>`;
+    b.querySelector(".label").textContent=item.label;
+    b.querySelector(".emoji").textContent=item.emoji;
+    b.addEventListener("click",()=>{words.push(item.say);renderSentence();if(!touchMode || touchSpeak) speak(item.say);});
+    board.appendChild(b);
+  });
+}
+function renderSentence(){
+  sentence.replaceChildren();
+  if(!words.length){
+    const p=document.createElement("span");p.className="placeholder";p.textContent="Your words will appear here…";sentence.appendChild(p);
+  } else {
+    words.forEach((word)=>{
+      const chip=document.createElement("span");chip.className="word-chip";chip.textContent=word;sentence.appendChild(chip);
+    });
+  }
+}
+function speak(text){
+  if(!("speechSynthesis" in window)){status.textContent="Speech is not supported in this browser. Try a recent version of Chrome, Edge, or Safari.";return;}
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.rate=slow?0.72:0.92;
+  utterance.pitch=1;
+  if(voice) utterance.voice=voice;
+  utterance.onstart=()=>{status.textContent="Speaking…";};
+  utterance.onend=()=>{status.textContent="";};
+  utterance.onerror=()=>{status.textContent="Unable to play speech. Please try again.";};
+  window.speechSynthesis.speak(utterance);
+}
+document.getElementById("speakBtn").addEventListener("click",()=>{
+  if(words.length) speak(words.join(" "));
+  else status.textContent="Choose a picture to start your message.";
+});
+document.getElementById("undoBtn").addEventListener("click",()=>{words.pop();renderSentence();status.textContent="";});
+document.getElementById("clearBtn").addEventListener("click",()=>{words=[];renderSentence();status.textContent="";});
+document.getElementById("stopBtn").addEventListener("click",()=>{if("speechSynthesis" in window)window.speechSynthesis.cancel();status.textContent="Speech stopped.";});
+document.getElementById("touchBtn").addEventListener("click",e=>{
+  touchMode=!touchMode;
+  document.body.classList.toggle("touch-mode",touchMode);
+  e.currentTarget.setAttribute("aria-pressed",String(touchMode));
+  e.currentTarget.textContent=touchMode?"👆 Touch mode: On":"👆 Touch mode: Off";
+  document.getElementById("touchHint").textContent=touchMode?"Touch mode on — bigger buttons":"Touch mode is off";
+  status.textContent=touchMode?"Larger touch targets enabled.":"Standard button size enabled.";
+});
+document.getElementById("slowBtn").addEventListener("click",e=>{
+  slow=!slow;e.currentTarget.setAttribute("aria-pressed",String(slow));e.currentTarget.textContent=slow?"🐢 Slow voice: On":"🐢 Slow voice: Off";
+});
+renderBoard();
+</script>
+</body>
+</html>
